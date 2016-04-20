@@ -39,7 +39,9 @@
 ##                                  Enjoy :)                                  ##
 ##----------------------------------------------------------------------------##
 
-
+################################################################################
+## Functions                                                                  ##
+################################################################################
 print_help()
 {
     echo -en "Usage:
@@ -76,10 +78,10 @@ Notes:                                                                          
 
 print_version()
 {
-    echo -e "super-rename - 0.2.0 - N2OMatt <n2omatt@amazingcow.com> \n\
-Copyright (c) 2015, 2016 - Amazing Cow                                \n\
-This is a free software (GPLv3) - Share/Hack it                       \n\
-Check opensource.amazingcow.com for more :)                           \n\
+    echo -e "$APP_NAME - $APP_VERSION - N2OMatt <n2omatt@amazingcow.com> \n\
+Copyright (c) 2015, 2016 - Amazing Cow                                   \n\
+This is a free software (GPLv3) - Share/Hack it                          \n\
+Check opensource.amazingcow.com for more :)                              \n\
 "
     if [ $1 != "-1" ]; then
         exit $1;
@@ -92,14 +94,56 @@ print_fatal()
     exit 1;
 }
 
+print_usage_warning()
+{
+echo "+---------------------------------------------------------------------+"
+echo "|                  AmazingCow - super-rename - v$APP_VERSION                 |"
+echo "|      This is a experimental version - under heavily development     |"
+echo "|          We are not sure about all bugs that this contains          |"
+echo "|          So PLEASE use it with care and report the bugs to          |"
+echo "|  <bugs_opensource@amazingcow.com> with the super-rename as subject  |"
+echo "|                               Enjoy...                              |"
+echo "+---------------------------------------------------------------------+"
+}
+
+prompt_continue()
+{
+    while true; do
+        echo -en "Continue: [y/N]: "
+        read CONTINUE;
+
+        if [ "$CONTINUE" != "y" ]; then
+            echo "Not continuing...";
+            exit 0;
+        else
+            break;
+        fi;
+    done;
+}
+
+canonize_path()
+{
+    #COWTODO: This is very ugly way to get the absolute path.                \
+    #         But the getopt(1) are passing the arguments without expanding  \
+    #         them (this is the expected behavior) we need expand it for the \
+    #         other commands/functions.
+    python -c "import os.path; \
+               print os.path.abspath(os.path.expanduser(\"$1\"))";
+}
+export -f canonize_path
+
+
 ################################################################################
 ## CONSTANTS                                                                  ##
 ################################################################################
-TMP_FILENAME=~/Desktop/file.txt #"/tmp/cow_super_rename_tmpfile.txt";
-TMP_FOLDER="/tmp/cow_super_rename_tmpfile_backup/";
+TMP_FILENAME="/tmp/cow_super_rename_tmpfile.txt";
+TMP_FOLDER="/tmp/cow_super_rename_backup";
 
 SHORT_OPT="hvs:p:f:t:"
 LONG_OPT="help,version,start-path:,file-regex:,from-regex:,to-regex:";
+
+APP_NAME="super-rename";
+APP_VERSION="0.0.2";
 
 
 ################################################################################
@@ -159,74 +203,118 @@ if [ -z "$START_PATH" ]; then
         print_fatal "<start-path> can only be omitted or treated as positional \n \
        if all other options are set by flags.";
     fi;
+
+    #All regexes are set by flag options:
+    # So grab the start-path from the non flag option or set the default.
+    if [ -n "$1" ]; then
+        START_PATH="$1";
+    else
+        START_PATH=".";
+    fi;
 fi;
 
-#All regexes are set by flag options:
-# So grab the start-path from the non flag option or set the default.
-if [ -n "$1" ]; then
-    START_PATH="$1";
-else
-    START_PATH=".";
+#Check if all regexes are set.
+if [ -z "$FILE_REGEX" ]; then
+    print_fatal "Missing the <file-regex>.";
 fi;
-
+if [ -z "$FROM_REGEX" ]; then
+    print_fatal "Missing the <from-regex>";
+fi;
+if [ -z "$TO_REGEX" ]; then
+    print_fatal "Missing the <to-regex>";
+fi;
 
 #getopt(1) give us the arguments enclosed by quotes - We don't want that.
+#COWTODO: This are the wrong way to remove the '' - This way we're removing \
+#         all quotes but we are meant to remove only the front and back ones.
 START_PATH=$(echo $START_PATH | sed s/\'/""/g );
+FILE_REGEX=$(echo $FILE_REGEX | sed s/\'/""/g );
+FROM_REGEX=$(echo $FROM_REGEX | sed s/\'/""/g );
+TO_REGEX=$(  echo $TO_REGEX   | sed s/\'/""/g );
 
-echo "START_PATH : $START_PATH"
-# echo "FILE_REGEX : $FILE_REGEX"
-# echo "FROM_REGEX : $FROM_REGEX"
-# echo "TO_REGEX   : $TO_REGEX"
+#We want the path as absolute paths.
+START_PATH=$(canonize_path $START_PATH);
+
+#COWTODO: Remove this warning when app stabilize.
+print_usage_warning;
+
+#COWTODO: Put in verbose echo when app stabilize.
+echo "Run info: ";
+echo "  TMP_FILENAME : $TMP_FILENAME";
+echo "  TMP_FOLDER   : $TMP_FOLDER";
+echo "  START_PATH   : $START_PATH";
+echo "  FILE_REGEX   : $FILE_REGEX";
+echo "  FROM_REGEX   : $FROM_REGEX";
+echo "  TO_REGEX     : $TO_REGEX";
+echo ""
+
+#COWTODO: Remove this prompt when app stabilize.
+prompt_continue;
 
 
+################################################################################
+### Script                                                                    ##
+################################################################################
+if [ ! -d "$START_PATH" ]; then
+    print_fatal "Invalid start-path ($START_PATH)";
+fi;
 
-# ################################################################################
-# ## Variables                                                                  ##
-# ################################################################################
-# START_PATH=$1;
-# FILE_regex=$2;
-# FROM_regex=$3;
-# TO_regex=$4;
-
-
-# ################################################################################
-# ## Script                                                                     ##
-# ################################################################################
 echo "Entering directory ($START_PATH)"
 cd "$START_PATH"
 
-echo "Making backup of ($START_PATH) at ($(realpath $TMP_FOLDER))"
-mkdir -p $TMP_FOLDER
-cp -fR $START_PATH $TMP_FOLDER
 
+## Make Backup ##
+#COWHACK: This is not needed every time - We should make a backup only if the \
+#         super-rename will do something.
+BACKUP_DIR_NAME=$(basename $(pwd));
+mkdir -p $TMP_FOLDER/$BACKUP_DIR_NAME;
+
+echo "Making backup of ($START_PATH) at ($(realpath $TMP_FOLDER/$BACKUP_DIR_NAME))"
+cp -fR . $TMP_FOLDER/$BACKUP_DIR_NAME;
+
+
+## Find all files that matches with file-regex. ##
 find . -iname "$FILE_REGEX" -type f -not \( -path "*/\.*" \) > $TMP_FILENAME
 
-# while read LINE; do
-#     GREP_CONTENTS_RESULT=$(grep "$FROM_regex" $LINE);
-#     GREP_FILENAME_RESULT=$(echo $LINE | grep "$FROM_regex");
-#     DID_SOMETHING=0;
 
-#     if [ -n "$GREP_CONTENTS_RESULT" ]; then
-#         echo "---> Changing file contents: ($LINE)";
-#         sed -i s/"$FROM_regex"/"$TO_regex"/g $LINE
-#         DID_SOMETHING=1;
-#     fi;
+## Iterate for all files that matches with file-regex. ##
+while read LINE; do
+    #Check if there is anything to change in file contents.
+    #and if the filename itself needs to be changed.
+    GREP_CONTENTS_RESULT=$(grep "$FROM_REGEX" $LINE);
+    GREP_FILENAME_RESULT=$(echo $LINE | grep "$FROM_REGEX");
+    DID_SOMETHING=0;
 
-#     if [ -n "$GREP_FILENAME_RESULT" ]; then
-#         ORIGINAL_FILENAME=$LINE;
-#         TARGET_FILENAME=$(echo $LINE | sed s/"$FROM_regex"/"$TO_regex"/g);
+    #Change the file content.
+    if [ -n "$GREP_CONTENTS_RESULT" ]; then
+        echo "---> Changing file contents: ($LINE)";
+        sed -i s/"$FROM_REGEX"/"$TO_REGEX"/g $LINE
+        DID_SOMETHING=1;
+    fi;
 
-#         echo "---> Renaming file from ("$ORIGINAL_FILENAME") to ("$TARGET_FILENAME")";
-#         mv "$ORIGINAL_FILENAME" "$TARGET_FILENAME";
+    #Change the file name.
+    if [ -n "$GREP_FILENAME_RESULT" ]; then
+        ORIGINAL_FILENAME=$LINE;
+        CHANGED_FILENAME=$(echo $LINE | sed s/"$FROM_REGEX"/"$TO_REGEX"/g);
 
-#         DID_SOMETHING=1;
-#     fi;
+        ORIGINAL_BASENAME=$(basename $ORIGINAL_FILENAME);
+        ORIGINAL_DIRNAME=$(dirname $ORIGINAL_FILENAME);
+        TARGET_BASENAME=$(basename $CHANGED_FILENAME);
 
-#     if [ $DID_SOMETHING -eq 1 ]; then
-#          echo "----------------------------------------------------------------";
-#     fi;
+        if [ "$ORIGINAL_BASENAME" != "$TARGET_BASENAME" ]; then
+            TARGET_FILENAME=$ORIGINAL_DIRNAME/$TARGET_BASENAME;
 
-# done < $TMP_FILENAME
+            echo "---> Renaming file from ("$ORIGINAL_FILENAME") to ("$TARGET_FILENAME")";
+            mv $ORIGINAL_FILENAME $TARGET_FILENAME
 
+            DID_SOMETHING=1;
+        fi;
+    fi;
 
-# echo $"done..."
+    if [ $DID_SOMETHING -eq 1 ]; then
+         echo "----------------------------------------------------------------";
+    fi;
+
+done < $TMP_FILENAME
+
+echo $"done..."
