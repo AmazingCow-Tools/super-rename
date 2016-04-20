@@ -1,2 +1,44 @@
+================================================================================
+== Start v0.0.x                                                               ==
+================================================================================
+version 0.0.2 - Apr 20, 2016 - Happy birthday to me :D
+-- General --
+    - Make the super-rename more robust.
+    - Now it accepts command line options.
+    - More error checking.
+
+-- Source --
+    super-rename.sh
+        - Add comments separators
+        - Add vars to hold the app name and version.
+        - Update the print_version function to use the APP_NAME and
+          APP_VERSION vars.
+        - Add the print_usage_warning with a warning about possible
+          bugs in this version of super-rename.
+        - Add a prompt to get if user wants to continue.
+        - Add function to get the abs path [COWTODO]
+        - Fix the TMP_FILENAME and TMP_FOLDER vars.
+        - Fix the checking the command line options.
+        - Add code to unquote the values that came from getopt(1) [COWTODO]
+        - Add a run info printing. [COWTODO]
+        - Add more error checking.
+        - Add some COWTODOs and COWHACKs...
+        - Fix the rename of filenames.
+        - Start making the super-rename more robust.
+        - Add the license header.
+        - Add the print functions.
+        - Add comment separators.
+        - Add the ability of parse short and long options.
+
+-- Info Files --
+    README.md
+        - Write the README.
+
+    CHANGELOG.txt
+        - Update the version | date format.
+        - Split the CHANGELOG entry in sections.
+
+
+--------------------------------------------------------------------------------
 [v0.0.1] - April 5, 2016
     Proof of concept - Basic implementation done.
