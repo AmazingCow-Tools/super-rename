@@ -25,8 +25,8 @@ by hand we prefer:
 ```$ super-rename -s/path/to/next/project -p* -fNowProject -tNextProject```
 
 For example, take a look in our 
-[CoreRandom](https//github.com/AmazingCow-Game-Core/CoreRandom) 
-and [CoreCoord](https//github.com/AmazingCow-Game-Core/CoreCoord) trees:
+[CoreRandom](http://www.github.com/AmazingCow-Game-Core/CoreRandom) 
+and [CoreCoord](http://www.github.com/AmazingCow-Game-Core/CoreCoord) trees:
 
 ``` 
 $ tree /path/to/CoreCoord 
@@ -98,8 +98,7 @@ As usual, you are **very welcomed** to **share** and **hack** it.
 
 ## Usage:
 
-``` bash
-Usage:
+``` 
   super-rename -h | -v                                                          
   super-rename [-s <start-path>] -p <file-regex> -f <from-regex> -t <to-regex>  
   super-rename <start-path> <file-regex> <from-regex> <to-regex>                
@@ -183,7 +182,7 @@ This software is released under GPLv3.
 Check the TODO file for general things.
 
 This projects uses the COWTODO tags.   
-So install [cowtodo](http://www.github.com/AmazingCow-Tools/COWTODO.html) and run:
+So install [cowtodo](http://www.github.com/AmazingCow-Tools/COWTODO) and run:
 
 ``` bash
 $ cd path/for/the/project
