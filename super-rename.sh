@@ -143,7 +143,7 @@ SHORT_OPT="hvs:p:f:t:"
 LONG_OPT="help,version,start-path:,file-regex:,from-regex:,to-regex:";
 
 APP_NAME="super-rename";
-APP_VERSION="0.0.2";
+APP_VERSION="0.0.3";
 
 
 ################################################################################
