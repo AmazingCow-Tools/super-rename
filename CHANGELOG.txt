@@ -1,6 +1,19 @@
 ================================================================================
 == Start v0.0.x                                                               ==
 ================================================================================
+version 0.0.3 - Apr 22, 2016
+-- General --
+    - Fix the README.
+-- Source --
+    super-rename.sh
+    - Update the version numbers.
+
+-- Info Files --
+    README.md
+    - Fix the wrong links
+    - Fix the syntax coloring
+
+--------------------------------------------------------------------------------
 version 0.0.2 - Apr 20, 2016 - Happy birthday to me :D
 -- General --
     - Make the super-rename more robust.
