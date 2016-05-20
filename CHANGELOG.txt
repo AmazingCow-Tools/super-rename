@@ -1,6 +1,19 @@
 ================================================================================
 == Start v0.0.x                                                               ==
 ================================================================================
+version 0.0.4 - May 19, 2016
+-- General --
+    - "Fix" a bug that letting pass regex containing spaces
+       in --from-regex and --to-regex.
+
+-- Source --
+    super-rename.sh
+        - Update the flags parsing to handle the spaces in
+          --from-regex and --to-regex.
+        - Add a COWHACK explaining that currently our solution
+          is **very** ugly.
+
+--------------------------------------------------------------------------------
 version 0.0.3 - Apr 22, 2016
 -- General --
     - Fix the README.
