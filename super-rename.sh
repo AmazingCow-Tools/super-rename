@@ -296,6 +296,8 @@ while read LINE; do
     #Change the file content.
     if [ -n "$GREP_CONTENTS_RESULT" ]; then
         echo "---> Changing file contents: ($LINE)";
+        grep --line-number "$FROM_REGEX" $LINE;
+
         sed -i s/"$FROM_REGEX"/"$TO_REGEX"/g $LINE
         DID_SOMETHING=1;
     fi;
@@ -320,7 +322,7 @@ while read LINE; do
     fi;
 
     if [ $DID_SOMETHING -eq 1 ]; then
-         echo "----------------------------------------------------------------";
+         echo $(head -c $(tput cols) < /dev/zero | tr '\0' '-')
     fi;
 
 done < $TMP_FILENAME
