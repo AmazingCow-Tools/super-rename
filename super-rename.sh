@@ -143,7 +143,7 @@ SHORT_OPT="hvs:p:f:t:"
 LONG_OPT="help,version,start-path:,file-regex:,from-regex:,to-regex:";
 
 APP_NAME="super-rename";
-APP_VERSION="0.0.3";
+APP_VERSION="0.0.4";
 
 
 ################################################################################
@@ -158,6 +158,8 @@ FROM_REGEX="";
 TO_REGEX="";
 
 
+echo "$RESULT"
+
 ################################################################################
 ## Script Initialization                                                      ##
 ################################################################################
@@ -166,19 +168,25 @@ if [ $# -eq 1 ]; then
     print_help 1;
 fi;
 
+#COWHACK: This is very messy.  \
+#  The way that we're getting the regex from  the cmd line is far from ideal. \
+#  Today we are getting the start-path an file-regex as the raw value         \
+#  from the getopt to pass it to the find(3), but we need treat the           \
+#  from-regex and the to-regex because it may contain spaces.                 \
+#  Ideally we must handle all regex for spaces and special chars.             \
+#
 while [ $# -gt 0 ]; do
     case "$1" in
-        -h | --help       ) print_help    0   ;;
-        -v | --version    ) print_version 0   ;;
-        -s | --start-path ) START_PATH="$2"   ;;
-        -p | --file-regex ) FILE_REGEX="$2"   ;;
-        -f | --from-regex ) FROM_REGEX="$2"   ;;
-        -t | --to-regex   ) TO_REGEX="$2"     ;;
+        -h | --help       ) print_help    0                         ;;
+        -v | --version    ) print_version 0                         ;;
+        -s | --start-path ) START_PATH=$2                           ;;
+        -p | --file-regex ) FILE_REGEX=$2                           ;;
+        -f | --from-regex ) FROM_REGEX=$(echo "$*" | cut  -d\' -f2) ;;
+        -t | --to-regex   ) TO_REGEX=$(echo   "$*" | cut  -d\' -f2) ;;
         -- ) shift; break;; #Remove the last -- and stop letting the $1..$n alone
     esac
     shift
 done;
-
 
 #No flag options was given:
 #  So check if he passed all the four required options as non flag options.
