@@ -2,7 +2,7 @@ Title:
     super-rename
 Description:
     Is a program that changes the content and/or rename the files that matches a given regex.
-    <br><b>Abandoned</b>
+    <br><b>DEPRECATED</b>
 URL:
     Github, http://github.com/AmazingCow-Tools/super-rename
 Owner:
